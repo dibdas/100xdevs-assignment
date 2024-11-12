@@ -27,6 +27,27 @@ router.get("/courses", (req, res) => {
 
 router.post("/courses/:courseId", userMiddleware, (req, res) => {
   // Implement course purchase logic
+  const courseId = req.params.courseId;
+  const username = req.headers.username;
+  // const username = req.headers.username;
+  console.log("username", username);
+  console.log(courseId);
+  User.findOneAndUpdate(
+    { username },
+    {
+      $push: { purchasedCourses: courseId },
+      // $push: { purchasedCourses: mongoose.Types.ObjectId(courseId) },
+    },
+    { new: true }
+  )
+    .then(function (result) {
+      result
+        ? res.json({ msg: "course added and updated", result })
+        : res.status(403).json({ msg: "course not updated" });
+    })
+    .catch(function (error) {
+      console.log("error" + error);
+    });
 });
 
 router.get("/purchasedCourses", userMiddleware, (req, res) => {
